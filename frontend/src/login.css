@@ -1,0 +1,317 @@
+/* ── Login Page Styles ────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+.lgi-root {
+  --lgi-bg:       #0b0b0b;
+  --lgi-text:     #ede8e0;
+  --lgi-muted:    rgba(237,232,224,0.45);
+  --lgi-faint:    rgba(237,232,224,0.22);
+  --lgi-border:   rgba(237,232,224,0.14);
+  --lgi-accent:   #8b3e22;
+  --lgi-accent-h: #a34c2a;
+  --lgi-line:     rgba(237,232,224,0.18);
+  --lgi-line-hi:  rgba(237,232,224,0.55);
+  --lgi-font-d:   'Playfair Display', Georgia, serif;
+  --lgi-font-b:   'DM Sans', system-ui, sans-serif;
+  --lgi-font-m:   'JetBrains Mono', monospace;
+
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--lgi-bg);
+  color: var(--lgi-text);
+  font-family: var(--lgi-font-b);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Canvas ──────────────────────────────────────────────────────────────── */
+.lgi-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+.lgi-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 52px;
+  border-bottom: 1px solid var(--lgi-border);
+}
+
+.lgi-nav-logo {
+  font-family: var(--lgi-font-d);
+  font-size: 15px;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--lgi-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.01em;
+  transition: opacity 200ms ease;
+}
+.lgi-nav-logo:hover { opacity: 0.7; }
+
+.lgi-nav-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--lgi-font-m);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--lgi-muted);
+  text-transform: uppercase;
+}
+
+.lgi-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4caf6e;
+  box-shadow: 0 0 6px rgba(76,175,110,0.7);
+  animation: lgi-blink 2.5s ease-in-out infinite;
+}
+
+@keyframes lgi-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Main Layout ─────────────────────────────────────────────────────────── */
+.lgi-main {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 0 0 min(14vw, 200px);
+}
+
+/* ── Form ────────────────────────────────────────────────────────────────── */
+.lgi-form {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: lgi-fadein 0.55s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes lgi-fadein {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lgi-heading {
+  font-family: var(--lgi-font-d);
+  font-size: 28px;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--lgi-text);
+  margin-bottom: 36px;
+  letter-spacing: -0.01em;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
+.lgi-error {
+  font-size: 12px;
+  color: #e05c3a;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Field ───────────────────────────────────────────────────────────────── */
+.lgi-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.lgi-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.lgi-label {
+  font-family: var(--lgi-font-b);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lgi-muted);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.lgi-label-row .lgi-label {
+  margin-bottom: 0;
+}
+
+.lgi-show-toggle {
+  font-family: var(--lgi-font-m);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--lgi-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 180ms ease;
+  text-transform: uppercase;
+}
+.lgi-show-toggle:hover { color: var(--lgi-text); }
+
+/* ── Input (underline-only) ──────────────────────────────────────────────── */
+.lgi-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--lgi-line);
+  outline: none;
+  color: var(--lgi-text);
+  font-family: var(--lgi-font-b);
+  font-size: 14px;
+  font-weight: 300;
+  padding: 6px 0 10px;
+  width: 100%;
+  transition: border-color 220ms ease;
+  letter-spacing: 0.02em;
+}
+
+.lgi-input::placeholder {
+  color: var(--lgi-faint);
+  font-weight: 300;
+}
+
+.lgi-input:focus {
+  border-bottom-color: transparent;
+}
+
+/* Animated underline */
+.lgi-underline {
+  height: 1px;
+  background: var(--lgi-line-hi);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 280ms cubic-bezier(0.16,1,0.3,1);
+  margin-top: -1px;
+}
+
+.lgi-field--focused .lgi-underline {
+  transform: scaleX(1);
+}
+
+/* ── Submit ──────────────────────────────────────────────────────────────── */
+.lgi-submit {
+  margin-top: 8px;
+  margin-bottom: 24px;
+  width: 100%;
+  padding: 14px 0;
+  background: var(--lgi-accent);
+  border: none;
+  border-radius: 3px;
+  color: #f5e8d8;
+  font-family: var(--lgi-font-b);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 200ms ease, transform 180ms ease, box-shadow 200ms ease;
+  min-height: 46px;
+}
+
+.lgi-submit:hover:not(:disabled) {
+  background: var(--lgi-accent-h);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(139,62,34,0.4);
+}
+
+.lgi-submit:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(139,62,34,0.3);
+}
+
+.lgi-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Loading spinner inside button */
+.lgi-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(245,232,216,0.3);
+  border-top-color: #f5e8d8;
+  border-radius: 50%;
+  animation: lgi-spin 0.65s linear infinite;
+}
+
+@keyframes lgi-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Text Links ──────────────────────────────────────────────────────────── */
+.lgi-link {
+  font-family: var(--lgi-font-b);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--lgi-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 180ms ease;
+  margin-bottom: 16px;
+  letter-spacing: 0.01em;
+}
+.lgi-link:hover { color: var(--lgi-text); }
+
+.lgi-link--accent {
+  color: #c07050;
+  margin-bottom: 0;
+  font-weight: 500;
+}
+.lgi-link--accent:hover { color: #d48060; }
+
+.lgi-register {
+  font-size: 12.5px;
+  color: var(--lgi-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .lgi-nav { padding: 0 20px; }
+  .lgi-main {
+    justify-content: center;
+    padding: 40px 24px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+  .lgi-form { max-width: 100%; }
+}

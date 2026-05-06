@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const AXIS_DESCRIPTIONS = {
   'Opportunity': 'Overall whitespace gap between research and market.',
   'Research': 'Academic momentum and volume of scientific papers.',
@@ -31,10 +33,183 @@ function extractMetrics(opp) {
   ];
 }
 
+/* ── Research Papers Panel ──────────────────────────────────────────────── */
+function ResearchPanel({ opp, onClose }) {
+  const [papers,  setPapers]  = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
+  const [source,  setSource]  = useState(null);
+  const [attempt, setAttempt] = useState(0); // increment to retry
+
+  const domain = opp.domain || opp.title || opp.name || '';
+  const score  = Number(opp.score ?? 50);
+  const researchMatch = opp.summary?.match(/Research signals?:\s*(\d+)/i);
+  const productMatch  = opp.summary?.match(/Product signals?:\s*(\d+)/i);
+  const rCount = researchMatch ? Number(researchMatch[1]) : 0;
+  const pCount = productMatch  ? Number(productMatch[1])  : 0;
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setPapers([]);
+
+    const url = `${API_BASE}/papers?query=${encodeURIComponent(domain)}&limit=6`;
+
+    fetch(url)
+      .then(async r => {
+        const json = await r.json();
+        if (!r.ok) throw new Error(json.error || `Server error ${r.status}`);
+        return json;
+      })
+      .then(json => {
+        if (cancelled) return;
+        // Backend returns { data: Paper[], source: string }
+        const items = (json.data || []).filter(p => p.title);
+        setPapers(items);
+        setSource(json.source || null);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setError(err.message || 'Unable to load papers. Please try again.');
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [domain, attempt]); // re-run on manual retry
+
+  // Gap rationale
+  const gapRationale = (() => {
+    if (rCount > 5000 && pCount < 1000)  return `Strong academic signal (${rCount.toLocaleString()} papers) with thin product coverage (${pCount.toLocaleString()} repos) — a wide-open commercialisation gap.`;
+    if (rCount > 1000 && pCount < 5000)  return `Growing research base (${rCount.toLocaleString()} papers) outpacing market build-out (${pCount.toLocaleString()} repos) — early-mover advantage available.`;
+    if (pCount > rCount * 5)             return `High product saturation (${pCount.toLocaleString()} repos) relative to research (${rCount.toLocaleString()} papers) — focus on differentiation.`;
+    return `Research volume (${rCount.toLocaleString()}) vs product volume (${pCount.toLocaleString()}) yields an opportunity score of ${score}/100.`;
+  })();
+
+  return (
+    <div
+      style={{
+        marginTop: '12px',
+        background: 'rgba(28, 14, 6, 0.95)',
+        border: '1px solid rgba(220,203,190,0.15)',
+        borderRadius: '12px',
+        padding: '20px 22px',
+        animation: 'fadeSlideUp 300ms cubic-bezier(0.16,1,0.3,1) both',
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <div>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(220,203,190,0.4)', marginBottom: '4px' }}>● RESEARCH INTELLIGENCE</p>
+          <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: '600', color: '#DCCBBE' }}>Top Papers — {domain}</h4>
+        </div>
+        <button
+          onClick={onClose}
+          style={{ background: 'none', border: 'none', color: 'rgba(220,203,190,0.4)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '2px 6px', borderRadius: '4px', transition: 'color 150ms ease' }}
+          onMouseEnter={e => e.target.style.color = '#DCCBBE'}
+          onMouseLeave={e => e.target.style.color = 'rgba(220,203,190,0.4)'}
+          title="Close"
+        >✕</button>
+      </div>
+
+      {/* Gap rationale chip */}
+      <div style={{ background: 'rgba(220,203,190,0.06)', border: '1px solid rgba(220,203,190,0.12)', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+        <span style={{ fontSize: '14px', flexShrink: 0, marginTop: '1px' }}>🔍</span>
+        <p style={{ fontSize: '11.5px', color: 'rgba(220,203,190,0.65)', lineHeight: '1.6', margin: 0 }}>
+          <strong style={{ color: '#DCCBBE' }}>Why this gap scores {score}/100:</strong>&nbsp;{gapRationale}
+        </p>
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '20px 0', color: 'rgba(220,203,190,0.45)', fontSize: '12px' }}>
+          <span style={{ width: 16, height: 16, border: '2px solid rgba(220,203,190,0.2)', borderTopColor: '#DCCBBE', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
+          Fetching research papers… (trying Semantic Scholar, arXiv fallback ready)
+        </div>
+      )}
+
+      {/* Error + retry */}
+      {!loading && error && (
+        <div style={{ padding: '12px 0', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <p style={{ fontSize: '12px', color: '#e05c3a', margin: 0 }}>⚠ {error}</p>
+          <button
+            onClick={() => setAttempt(a => a + 1)}
+            style={{ fontSize: '11px', padding: '4px 12px', background: 'rgba(220,203,190,0.08)', border: '1px solid rgba(220,203,190,0.2)', borderRadius: '6px', color: '#DCCBBE', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'background 150ms ease' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(220,203,190,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(220,203,190,0.08)'}
+          >↺ Retry</button>
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && !error && papers.length === 0 && (
+        <p style={{ fontSize: '12px', color: 'rgba(220,203,190,0.4)', padding: '12px 0' }}>No papers found for this domain.</p>
+      )}
+
+      {/* Papers list */}
+      {!loading && !error && papers.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {papers.map((paper, idx) => {
+            // Backend normalizes: { title, authors[], year, abstract, citationCount, url, source }
+            const authors  = Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || '');
+            const abstract = paper.abstract ? paper.abstract.slice(0, 200) + (paper.abstract.length > 200 ? '…' : '') : null;
+
+            return (
+              <div
+                key={paper.id || idx}
+                style={{
+                  background: 'rgba(220,203,190,0.04)',
+                  border: '1px solid rgba(220,203,190,0.09)',
+                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  animation: `fadeSlideUp 400ms cubic-bezier(0.16,1,0.3,1) ${idx * 60}ms both`,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
+                  <a
+                    href={paper.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: '600', color: '#DCCBBE', textDecoration: 'none', lineHeight: '1.4', flex: 1 }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}
+                  >
+                    {paper.title}
+                  </a>
+                  {paper.citationCount != null && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'rgba(220,203,190,0.5)', background: 'rgba(220,203,190,0.08)', padding: '2px 7px', borderRadius: '20px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      ★ {paper.citationCount.toLocaleString()} cited
+                    </span>
+                  )}
+                </div>
+
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'rgba(220,203,190,0.4)', marginBottom: abstract ? '6px' : 0 }}>
+                  {[authors, paper.year].filter(Boolean).join(' · ')}
+                </p>
+
+                {abstract && (
+                  <p style={{ fontSize: '11.5px', color: 'rgba(220,203,190,0.5)', lineHeight: '1.55', margin: 0 }}>{abstract}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <p style={{ fontSize: '10px', color: 'rgba(220,203,190,0.25)', marginTop: '14px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+        {source ? `Source: ${source}` : 'Semantic Scholar · arXiv · Open Research Corpus'}
+      </p>
+    </div>
+  );
+}
+
 export function GapRadar({ opportunities = [], riskAppetite = 'medium' }) {
   const [hoveredData, setHoveredData] = useState(null);
   const [tooltipPos, setTooltipPos] = useState(null);
-  
+  const [exploredId, setExploredId] = useState(null);
+
   const [isAnimating, setIsAnimating] = useState(true);
 
   const radarData = useMemo(() => {
@@ -324,12 +499,14 @@ export function GapRadar({ opportunities = [], riskAppetite = 'medium' }) {
               key={domain || i}
               style={{
                 background: "rgba(40, 22, 10, 0.6)",
-                border: isRiskMatch ? "1px solid var(--amber)" : "1px solid rgba(220, 203, 190, 0.10)",
+                borderTop: isRiskMatch ? "1px solid var(--amber)" : "1px solid rgba(220, 203, 190, 0.10)",
+                borderRight: isRiskMatch ? "1px solid var(--amber)" : "1px solid rgba(220, 203, 190, 0.10)",
+                borderBottom: isRiskMatch ? "1px solid var(--amber)" : "1px solid rgba(220, 203, 190, 0.10)",
+                borderLeft: score >= 75 ? "4px solid #DCCBBE" : score >= 45 ? "4px solid rgba(220,203,190,0.5)" : "4px solid rgba(220,203,190,0.2)",
                 borderRadius: "var(--radius-lg)",
                 padding: "16px 20px",
                 position: "relative",
                 overflow: "hidden",
-                borderLeft: score >= 75 ? "4px solid #DCCBBE" : score >= 45 ? "4px solid rgba(220,203,190,0.5)" : "4px solid rgba(220,203,190,0.2)",
               }}
               className={`animate-fade-up animate-fade-up-d${Math.min(i + 1, 5)}`}
             >
@@ -371,10 +548,33 @@ export function GapRadar({ opportunities = [], riskAppetite = 'medium' }) {
               </p>
 
               <div style={{ paddingLeft: "10px", display: "flex", justifyContent: "flex-end" }}>
-                <button style={{ fontSize: "12px", padding: "5px 12px", opacity: 0.5, cursor: "default", background: "transparent", border: "1px solid rgba(220,203,190,0.2)", borderRadius: "var(--radius-md)", color: "rgba(220,203,190,0.6)", fontFamily: "var(--font-body)" }} disabled>
-                  ▸ Explore
+                <button
+                  onClick={() => setExploredId(prev => prev === (domain || i) ? null : (domain || i))}
+                  style={{
+                    fontSize: "12px",
+                    padding: "5px 14px",
+                    cursor: "pointer",
+                    background: exploredId === (domain || i) ? "rgba(220,203,190,0.12)" : "transparent",
+                    border: exploredId === (domain || i) ? "1px solid rgba(220,203,190,0.5)" : "1px solid rgba(220,203,190,0.2)",
+                    borderRadius: "var(--radius-md)",
+                    color: exploredId === (domain || i) ? "#DCCBBE" : "rgba(220,203,190,0.6)",
+                    fontFamily: "var(--font-body)",
+                    transition: "all 180ms ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                  onMouseEnter={e => { if (exploredId !== (domain || i)) { e.currentTarget.style.background = 'rgba(220,203,190,0.06)'; e.currentTarget.style.color = '#DCCBBE'; } }}
+                  onMouseLeave={e => { if (exploredId !== (domain || i)) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(220,203,190,0.6)'; } }}
+                >
+                  {exploredId === (domain || i) ? '▾ Collapse' : '▸ Explore Research'}
                 </button>
               </div>
+
+              {/* Research panel — injected inline below the card */}
+              {exploredId === (domain || i) && (
+                <ResearchPanel opp={opp} onClose={() => setExploredId(null)} />
+              )}
             </div>
           );
         })}

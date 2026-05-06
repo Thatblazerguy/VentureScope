@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "node src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "restart": "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue).OwningProcess -Force -ErrorAction SilentlyContinue\" && node src/index.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

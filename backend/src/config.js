@@ -1,7 +1,11 @@
 const path = require('path');
 require('dotenv').config();
 
-const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+// Support comma-separated list of allowed origins
+const frontendOrigin = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://localhost:5174')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
 
 module.exports = {
   env: process.env.NODE_ENV || 'development',
