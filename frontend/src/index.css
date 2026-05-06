@@ -1,0 +1,704 @@
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Tailwind Base ─────────────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties ─────────────────────────────────────────────────── */
+:root {
+  /* Core backgrounds */
+  --ink:             #DCCBBE;
+  --panel:           #E8DACF;
+  --surface:         #F3EBE4;
+  --surface-raised:  #FFFFFF;
+
+  /* Borders */
+  --border:          rgba(117, 86, 63, 0.15);
+  --border-strong:   rgba(117, 86, 63, 0.35);
+  --border-focus:    rgba(117, 86, 63, 0.65);
+
+  /* Accent colors */
+  --amber:           #75563F;
+  --amber-light:     #8f6e54;
+  --amber-dark:      #573d2a;
+  --sienna:          #9c6441;
+  --cognac:          #b58462;
+
+  /* Text colors */
+  --cream:           #2a1e16;
+  --parchment:       #4c3727;
+  --linen:           #3a281c;
+  --fog:             #75563F;
+
+  /* State colors */
+  --danger:          #c0442a;
+  --danger-glow:     rgba(192, 68, 42, 0.15);
+  --success:         #5c9e6e;
+  --success-glow:    rgba(92, 158, 110, 0.15);
+
+  /* Glow effects */
+  --glow-amber:      rgba(117, 86, 63, 0.15);
+  --glow-amber-strong: rgba(117, 86, 63, 0.3);
+  --glow-cream:      rgba(42, 30, 22, 0.05);
+
+  /* Typography */
+  --font-display:    'Playfair Display', Georgia, serif;
+  --font-body:       'DM Sans', system-ui, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Courier New', monospace;
+
+  /* Spacing scale */
+  --radius-sm:       6px;
+  --radius-md:       10px;
+  --radius-lg:       16px;
+  --radius-xl:       22px;
+  --radius-pill:     9999px;
+
+  /* Sidebar width */
+  --sidebar-width:   280px;
+  --navbar-height:   56px;
+}
+
+/* ─── Base Reset & Globals ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  /* Subtle warm grain overlay using a repeating pattern */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(117, 86, 63, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%, rgba(117, 86, 63, 0.04) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* ─── Custom Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--panel);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cognac);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amber-dark);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cognac) var(--panel);
+}
+
+/* ─── Typography Utilities ──────────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.font-mono    { font-family: var(--font-mono); }
+
+.text-cream     { color: var(--cream); }
+.text-parchment { color: var(--parchment); }
+.text-fog       { color: var(--fog); }
+.text-amber     { color: var(--amber); }
+.text-sienna    { color: var(--sienna); }
+.text-danger    { color: var(--danger); }
+.text-success   { color: var(--success); }
+
+/* ─── Keyframe Animations ───────────────────────────────────────────────────── */
+
+/* Fade + slide up — used for card entrances */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Amber pulse ring — used for live status indicators */
+@keyframes amberPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(117, 86, 63, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(117, 86, 63, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(117, 86, 63, 0);
+  }
+}
+
+/* Slower glow pulse for large status dots */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(117, 86, 63, 0.6));
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 10px rgba(117, 86, 63, 0.3));
+  }
+}
+
+/* Danger pulse for offline/error states */
+@keyframes dangerPulse {
+  0% { box-shadow: 0 0 0 0 rgba(192, 68, 42, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(192, 68, 42, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(192, 68, 42, 0); }
+}
+
+/* Shimmer sweep — used on coming-soon panels */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+/* Streaming text cursor blink */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Tab content enter */
+@keyframes tabEnter {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slow background rotation for logo hex */
+@keyframes hexSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Count-up doesn't need a keyframe — handled in JS. */
+/* But we define a number reveal for initial mount */
+@keyframes numberReveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Animation Utility Classes ─────────────────────────────────────────────── */
+.animate-fade-up {
+  animation: fadeSlideUp 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-up-d1 { animation-delay: 60ms; }
+.animate-fade-up-d2 { animation-delay: 120ms; }
+.animate-fade-up-d3 { animation-delay: 180ms; }
+.animate-fade-up-d4 { animation-delay: 240ms; }
+.animate-fade-up-d5 { animation-delay: 300ms; }
+
+.animate-tab-enter {
+  animation: tabEnter 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-pulse-amber {
+  animation: amberPulse 2s ease-out infinite;
+}
+
+.animate-pulse-danger {
+  animation: dangerPulse 2s ease-out infinite;
+}
+
+.animate-glow {
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(117, 86, 63, 0.06) 40%,
+    rgba(117, 86, 63, 0.12) 50%,
+    rgba(117, 86, 63, 0.06) 60%,
+    transparent 100%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* ─── Card / Panel Base Styles ──────────────────────────────────────────────── */
+.vs-card {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 180ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vs-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 1px var(--border), 0 8px 32px rgba(117, 86, 63, 0.15), 0 0 20px var(--glow-cream);
+  transform: scale(1.004);
+}
+
+.vs-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--glow-cream), transparent 70%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ─── Button Base Styles ────────────────────────────────────────────────────── */
+.vs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+
+.vs-btn-primary {
+  background: linear-gradient(135deg, var(--amber) 0%, var(--amber-dark) 100%);
+  color: #DCCBBE;
+  box-shadow: 0 2px 12px rgba(117, 86, 63, 0.3);
+}
+
+.vs-btn-primary:hover {
+  background: linear-gradient(135deg, var(--amber-light) 0%, var(--amber) 100%);
+  box-shadow: 0 4px 20px rgba(117, 86, 63, 0.45);
+  transform: translateY(-1px);
+}
+
+.vs-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 6px rgba(117, 86, 63, 0.3);
+}
+
+.vs-btn-ghost {
+  background: transparent;
+  color: var(--parchment);
+  border: 1px solid var(--border);
+}
+
+.vs-btn-ghost:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--cream);
+}
+
+.vs-btn-danger {
+  background: rgba(192, 68, 42, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(192, 68, 42, 0.3);
+}
+
+.vs-btn-danger:hover {
+  background: rgba(192, 68, 42, 0.25);
+}
+
+/* Disabled state for all button variants */
+.vs-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading spinner inside buttons */
+.vs-btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(117, 86, 63, 0.25);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Input Base Styles ─────────────────────────────────────────────────────── */
+.vs-input {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 9px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.vs-input::placeholder {
+  color: var(--fog);
+}
+
+.vs-input:focus {
+  border-color: var(--border-focus);
+  background-color: var(--surface-raised);
+  box-shadow: 0 0 0 3px rgba(117, 86, 63, 0.12);
+}
+
+/* ─── Badge / Chip Styles ───────────────────────────────────────────────────── */
+.vs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.vs-badge-amber {
+  background: rgba(117, 86, 63, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(117, 86, 63, 0.25);
+}
+
+.vs-badge-success {
+  background: rgba(92, 158, 110, 0.15);
+  color: #2e7d4f;
+  border: 1px solid rgba(92, 158, 110, 0.25);
+}
+
+.vs-badge-danger {
+  background: rgba(192, 68, 42, 0.1);
+  color: #b03a20;
+  border: 1px solid rgba(192, 68, 42, 0.25);
+}
+
+.vs-badge-fog {
+  background: rgba(117, 86, 63, 0.1);
+  color: var(--parchment);
+  border: 1px solid var(--border);
+}
+
+/* Tag chip (domain tags in SOUL editor) */
+.vs-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--parchment);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.vs-tag-chip:hover {
+  background: var(--surface-raised);
+  border-color: var(--amber);
+}
+
+.vs-tag-chip .remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(117, 86, 63, 0.2);
+  color: var(--fog);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: background-color 150ms ease, color 150ms ease;
+  border: none;
+  flex-shrink: 0;
+}
+
+.vs-tag-chip .remove-btn:hover {
+  background: rgba(192, 68, 42, 0.35);
+  color: var(--danger);
+}
+
+/* ─── Divider ───────────────────────────────────────────────────────────────── */
+.vs-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+  width: 100%;
+}
+
+/* ─── Tooltip ───────────────────────────────────────────────────────────────── */
+.vs-tooltip {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  box-shadow: 0 8px 32px rgba(117, 86, 63, 0.2), 0 0 12px var(--glow-amber);
+  pointer-events: none;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+/* ─── Section label ─────────────────────────────────────────────────────────── */
+.vs-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fog);
+  margin-bottom: 10px;
+}
+
+/* ─── Sidebar-specific layout ───────────────────────────────────────────────── */
+.vs-sidebar-section {
+  padding: 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.vs-sidebar-section:last-child {
+  border-bottom: none;
+}
+
+/* ─── Stat tile (used in System Stats) ─────────────────────────────────────── */
+.vs-stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  transition: border-color 180ms ease;
+}
+
+.vs-stat-tile:hover {
+  border-color: var(--border-strong);
+}
+
+.vs-stat-tile .stat-number {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--amber);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.vs-stat-tile .stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fog);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ─── Score card redesign ───────────────────────────────────────────────────── */
+.vs-score-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 200ms ease, transform 180ms ease, box-shadow 200ms ease;
+}
+
+.vs-score-card:hover {
+  border-color: var(--border-strong);
+  transform: scale(1.01);
+  box-shadow: 0 8px 32px rgba(117, 86, 63, 0.18);
+}
+
+/* Left accent border that changes color based on score */
+.vs-score-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.vs-score-card.score-high::before  { background: linear-gradient(180deg, var(--amber), var(--sienna)); }
+.vs-score-card.score-mid::before   { background: linear-gradient(180deg, var(--parchment), var(--cognac)); }
+.vs-score-card.score-low::before   { background: linear-gradient(180deg, var(--fog), var(--surface-raised)); }
+
+/* ─── Coming Soon Panel ─────────────────────────────────────────────────────── */
+.vs-coming-soon-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 203, 190, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: inherit;
+  z-index: 10;
+  text-align: center;
+  padding: 32px;
+  gap: 12px;
+}
+
+.vs-coming-soon-content {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* ─── Copilot Chat ──────────────────────────────────────────────────────────── */
+.vs-chat-bubble-user {
+  background: rgba(117, 86, 63, 0.12);
+  border: 1px solid rgba(117, 86, 63, 0.2);
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  color: var(--cream);
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 75%;
+  align-self: flex-end;
+}
+
+.vs-chat-bubble-ai {
+  position: relative;
+  padding: 10px 16px 10px 20px;
+  color: var(--parchment);
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 85%;
+  align-self: flex-start;
+}
+
+.vs-chat-bubble-ai::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: linear-gradient(180deg, var(--amber), transparent);
+  border-radius: var(--radius-pill);
+}
+
+/* Streaming indicator */
+.vs-stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: var(--amber);
+  vertical-align: middle;
+  margin-left: 3px;
+  animation: cursorBlink 0.8s step-end infinite;
+}
+
+/* ─── Progress Bar ──────────────────────────────────────────────────────────── */
+.vs-progress-bar {
+  height: 6px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.vs-progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--amber-dark), var(--amber-light));
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Toggle Group (Risk Appetite) ─────────────────────────────────────────── */
+.vs-toggle-group {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.vs-toggle-group button {
+  flex: 1;
+  padding: 7px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fog);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  position: relative;
+}
+
+.vs-toggle-group button:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 1px;
+  background: var(--border);
+}
+
+.vs-toggle-group button.active {
+  background: linear-gradient(135deg, var(--amber), var(--amber-dark));
+  color: #DCCBBE;
+}
+
+.vs-toggle-group button:not(.active):hover {
+  background: var(--surface-raised);
+  color: var(--parchment);
+}
+
+/* ─── Responsive helpers ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  :root {
+    --sidebar-width: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* ─── Selection color ───────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(117, 86, 63, 0.25);
+  color: var(--cream);
+}
