@@ -1,15 +1,33 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-// ─── Utility: format relative time ──────────────────────────────────────────
-function relativeTime(dateStr) {
+// ─── Utility: parse Supabase timestamp as UTC (they omit the Z suffix) ───────
+function parseAsUTC(dateStr) {
+  if (!dateStr) return null;
+  // If it already has Z or a +offset, parse as-is; otherwise append Z
+  return new Date(/[Z+]/.test(dateStr) ? dateStr : dateStr + 'Z');
+}
+
+// ─── Utility: format relative time ───────────────────────────────────────────
+function relativeTime(dateStr, now = Date.now()) {
   if (!dateStr) return "never";
-  const diff = Date.now() - new Date(dateStr).getTime();
+  const diff = now - parseAsUTC(dateStr).getTime();
   const mins = Math.floor(diff / 60_000);
   if (mins < 1)  return "just now";
   if (mins < 60) return `${mins} min${mins === 1 ? "" : "s"} ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24)  return `${hrs} hour${hrs === 1 ? "" : "s"} ago`;
   return `${Math.floor(hrs / 24)} day(s) ago`;
+}
+
+
+// ─── Hook: live-ticking current timestamp (updates every 30s) ────────────────
+function useNow(intervalMs = 30_000) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
 }
 
 // ─── Utility: count-up animation ────────────────────────────────────────────
@@ -46,8 +64,9 @@ function useCountUp(target, duration = 800) {
 // opportunity in Supabase was updated within the last 5 minutes.
 // Uses the lastUpdatedAt prop passed from App.jsx (from your existing data fetch).
 function AgentStatusWidget({ lastUpdatedAt, onTriggerScan, isScanning }) {
+  const now = useNow();
   const isActive = lastUpdatedAt
-    ? Date.now() - new Date(lastUpdatedAt).getTime() < 5 * 60_000
+    ? now - parseAsUTC(lastUpdatedAt).getTime() < 5 * 60_000
     : false;
 
   return (
@@ -95,7 +114,7 @@ function AgentStatusWidget({ lastUpdatedAt, onTriggerScan, isScanning }) {
                 marginTop: "2px",
               }}
             >
-              Last scan: {relativeTime(lastUpdatedAt)}
+              Last scan: {relativeTime(lastUpdatedAt, now)}
             </div>
           </div>
         </div>
@@ -121,6 +140,16 @@ function AgentStatusWidget({ lastUpdatedAt, onTriggerScan, isScanning }) {
         )}
       </button>
     </div>
+  );
+}
+
+// ─── Last Saved Label (live ticker) ─────────────────────────────────────────
+function LastSavedLabel({ lastSaved }) {
+  const now = useNow();
+  return (
+    <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--fog)", textAlign: "center" }}>
+      last saved: {relativeTime(lastSaved, now)}
+    </p>
   );
 }
 
@@ -246,16 +275,7 @@ function SoulContextEditor({
 
       {/* Last saved timestamp */}
       {lastSaved && (
-        <p
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            color: "var(--fog)",
-            textAlign: "center",
-          }}
-        >
-          last saved: {relativeTime(lastSaved)}
-        </p>
+        <LastSavedLabel lastSaved={lastSaved} />
       )}
     </div>
   );

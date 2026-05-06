@@ -1,4 +1,5 @@
 const pipeline = require('./skills/pipeline');
+const generateDigest = require('./skills/digest');
 const fs = require('fs');
 const path = require('path');
 
@@ -39,14 +40,39 @@ console.error = function(...args) {
 
 async function run() {
   console.log("HEARTBEAT TRIGGERED");
-
   await pipeline({});
-
   console.log("DONE");
 }
 
-// Run every 60 seconds autonomously
+// ── Digest: run on boot, then every hour check if it's Monday ─────────────────
+async function runDigestIfNeeded() {
+  const digestPath = path.join(__dirname, 'digest.json');
+  const now = new Date();
+  const isMonday = now.getDay() === 1;
+
+  // Check if digest is stale (older than 6 days) or doesn't exist
+  let isStale = true;
+  if (fs.existsSync(digestPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(digestPath, 'utf8'));
+      const generatedAt = new Date(existing.generated_at);
+      const ageHours = (now - generatedAt) / 1000 / 3600;
+      isStale = ageHours > 144; // 6 days
+    } catch { isStale = true; }
+  }
+
+  if (isStale) {
+    console.log("📋 [Digest] Generating weekly digest...");
+    await generateDigest();
+  }
+}
+
+// Run pipeline every 60 seconds
 setInterval(run, 60000);
 
-// Also run immediately on boot
+// Check digest every hour
+setInterval(runDigestIfNeeded, 3600000);
+
+// Run both immediately on boot
 run();
+runDigestIfNeeded();

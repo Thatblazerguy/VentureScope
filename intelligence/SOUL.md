@@ -8,13 +8,13 @@ SOUL stores user intelligence for OpenClaw so the system can adapt discovery beh
 
 ```yaml
 user_profile:
-  domains: ["cricket"]
+  domains: ["lab grown meat", "fashion", "climate", "cricket"]
   interests: ["research"]
   exclusions: []
   risk_appetite: "low"
   behavior_signals: []
   discovery_preferences: []
-  last_updated: "2026-05-06T12:25:51.102Z"
+  last_updated: "2026-05-06T15:53:51.549Z"
 ```
 
 ## Usage Rules

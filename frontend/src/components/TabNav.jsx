@@ -1,10 +1,11 @@
 // Tab definitions. "coming-soon" tabs are visually locked.
 export const TABS = [
-  { id: "radar",    label: "Gap Radar",      icon: "◎",  status: "live" },
-  { id: "copilot",  label: "Venture Copilot", icon: "⚡", status: "live" },
-  { id: "intel",    label: "Investor Intel",  icon: "📡", status: "live" },
-  { id: "digest",   label: "Weekly Digest",   icon: "📋", status: "coming-soon" },
-  { id: "heartbeat",label: "HEARTBEAT Log",   icon: "💓", status: "live" },
+  { id: "radar",     label: "Gap Radar",        icon: "◎",  status: "live" },
+  { id: "copilot",   label: "Venture Copilot",  icon: "⚡", status: "live" },
+  { id: "intel",     label: "Investor Intel",   icon: "📡", status: "live" },
+  { id: "digest",    label: "Weekly Digest",    icon: "📋", status: "live" },
+  { id: "cofounder", label: "Co-Founder Match", icon: "🤝", status: "live" },
+  { id: "heartbeat", label: "HEARTBEAT Log",    icon: "💓", status: "live" },
 ];
 
 export default function TabNav({ activeTab, onTabChange }) {

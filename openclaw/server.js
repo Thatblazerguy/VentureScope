@@ -12,8 +12,20 @@ const port = process.env.PORT || 4000;
 const ai = new GoogleGenAI({ apiKey: process.env.LLM_API_KEY });
 const model = process.env.LLM_MODEL || 'gemini-2.5-flash';
 
+const BASE_SYSTEM_PROMPT = `You are the OpenClaw Venture Copilot — a sharp, concise AI assistant embedded inside VentureScope, an autonomous market intelligence platform.
+
+Your role is to help the user understand their tracked domains, interpret gap scores, and identify venture opportunities.
+
+Rules:
+- ALWAYS keep answers extremely concise: 2-4 sentences max.
+- Reference the user's specific domains and scores when relevant.
+- Never use generic advice — always tie it back to their actual SOUL context provided below.
+- Use numbers and data points from the context when available.
+- Avoid filler phrases like "Great question!" or "Certainly!".
+- If asked something unrelated to venture intelligence, politely redirect.`;
+
 app.post('/chat', async (req, res) => {
-  const { message } = req.body;
+  const { message, soulContext } = req.body;
 
   if (!process.env.LLM_API_KEY) {
     return res.status(500).send("OpenClaw LLM_API_KEY is missing.");
@@ -21,6 +33,11 @@ app.post('/chat', async (req, res) => {
 
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
+
+  // Build personalized system instruction
+  const systemInstruction = soulContext
+    ? `${BASE_SYSTEM_PROMPT}\n\n${soulContext}`
+    : BASE_SYSTEM_PROMPT;
 
   try {
     let responseStream;
@@ -31,7 +48,7 @@ app.post('/chat', async (req, res) => {
           model: model,
           contents: message,
           config: {
-            systemInstruction: "You are the OpenClaw Venture Copilot. You MUST keep your responses extremely concise, precise, and short. Never exceed 2-3 sentences. Do not ramble, use lists only if strictly necessary, and avoid conversational filler."
+            systemInstruction,
           }
         });
         break; // Success
@@ -55,7 +72,16 @@ app.post('/chat', async (req, res) => {
     res.end();
   } catch (error) {
     console.error("OpenClaw LLM Error:", error);
-    res.write("\n\n[OpenClaw Copilot failed to generate a response.]");
+    const status = error.status || 0;
+    let friendlyMsg;
+    if (status === 429) {
+      friendlyMsg = "⚠️ OpenClaw has hit the Gemini API daily quota limit. Please wait until midnight (Pacific Time) for the quota to reset, or add a billing account at aistudio.google.com.";
+    } else if (status === 503) {
+      friendlyMsg = "⚠️ Gemini is temporarily overloaded. Please try again in a few seconds.";
+    } else {
+      friendlyMsg = "⚠️ OpenClaw Copilot failed to generate a response. Please try again.";
+    }
+    res.write(friendlyMsg);
     res.end();
   }
 });

@@ -8,6 +8,7 @@ import { GapRadar } from "./components/GapRadar";
 import { CopilotChat } from "./components/CopilotChat";
 import InvestorIntel  from "./components/InvestorIntel";
 import WeeklyDigest   from "./components/WeeklyDigest";
+import CoFounderMatch from "./components/CoFounderMatch";
 import HeartbeatLog   from "./components/HeartbeatLog";
 
 import { getContext, getOpportunities, updateContext, API_BASE_URL } from './lib/api';
@@ -214,6 +215,13 @@ export default function App() {
         return (
           <div key="digest" className="animate-tab-enter" style={{ padding: "24px" }}>
             <WeeklyDigest />
+          </div>
+        );
+
+      case "cofounder":
+        return (
+          <div key="cofounder" className="animate-tab-enter" style={{ padding: "24px" }}>
+            <CoFounderMatch />
           </div>
         );
 
