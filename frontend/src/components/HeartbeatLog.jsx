@@ -1,29 +1,46 @@
-import ComingSoonPanel from "./ComingSoonPanel";
+import { useEffect, useState, useRef } from "react";
+import { API_BASE_URL } from "../lib/api";
 
-// Blurred mock terminal log preview
-function MockTerminalLog() {
-  const mockLines = [
-    { time: "13:37:02", level: "INFO",    msg: "HEARTBEAT triggered by SOUL context change" },
-    { time: "13:37:03", level: "INFO",    msg: "Domains in scope: underwater robotics, ai agents" },
-    { time: "13:37:04", level: "SCAN",    msg: "Querying ArXiv API — underwater robotics" },
-    { time: "13:37:06", level: "RESULT",  msg: "ArXiv: 10 papers found, 3 new since last run" },
-    { time: "13:37:07", level: "SCAN",    msg: "Querying GitHub Search — underwater robotics" },
-    { time: "13:37:09", level: "RESULT",  msg: "GitHub: 20 repos found, 5 with recent commits" },
-    { time: "13:37:09", level: "DB",      msg: "Upserted to Supabase: 1 record (score: 84)" },
-    { time: "13:37:10", level: "SCAN",    msg: "Querying ArXiv API — ai agents" },
-    { time: "13:37:12", level: "RESULT",  msg: "ArXiv: 22 papers found, 8 new since last run" },
-    { time: "13:37:13", level: "RESULT",  msg: "GitHub: 45 repos found, 12 recently updated" },
-    { time: "13:37:14", level: "DB",      msg: "Upserted to Supabase: 1 record (score: 91)" },
-    { time: "13:37:14", level: "DONE",    msg: "Pipeline complete in 12.4s · 2 domains · 2 upserts" },
-  ];
+const levelColor = {
+  INFO:   "var(--fog)",
+  SCAN:   "var(--parchment)",
+  RESULT: "var(--amber)",
+  DB:     "#7ec99a",
+  DONE:   "var(--amber-light)",
+  ERROR:  "var(--danger)",
+};
 
-  const levelColor = {
-    INFO:   "var(--fog)",
-    SCAN:   "var(--parchment)",
-    RESULT: "var(--amber)",
-    DB:     "#7ec99a",
-    DONE:   "var(--amber-light)",
-  };
+function TerminalLog() {
+  const [logs, setLogs] = useState([]);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
+
+  useEffect(() => {
+    const apiBase = API_BASE_URL || "http://localhost:8000";
+    const eventSource = new EventSource(`${apiBase}/logs/stream`);
+    
+    eventSource.onmessage = (event) => {
+      try {
+        const logLine = JSON.parse(event.data);
+        setLogs((prev) => {
+          const next = [...prev, logLine];
+          // keep last 100 lines
+          if (next.length > 100) return next.slice(next.length - 100);
+          return next;
+        });
+      } catch (err) {
+        // Fallback for non-JSON lines
+        setLogs((prev) => [...prev, { time: new Date().toLocaleTimeString(), level: "INFO", msg: event.data }]);
+      }
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   return (
     <div
@@ -36,12 +53,16 @@ function MockTerminalLog() {
         lineHeight: "2",
         margin: "16px",
         border: "1px solid var(--border)",
-        maxHeight: "340px",
-        overflow: "hidden",
+        height: "calc(100vh - 280px)",
+        minHeight: "400px",
+        overflowY: "auto",
       }}
     >
-      {mockLines.map((line, i) => (
-        <div key={i} style={{ display: "flex", gap: "12px" }}>
+      {logs.length === 0 && (
+        <div style={{ color: "var(--fog)", fontStyle: "italic" }}>Waiting for logs...</div>
+      )}
+      {logs.map((line, i) => (
+        <div key={i} style={{ display: "flex", gap: "12px", animation: "fadeSlideUp 200ms ease both" }}>
           <span style={{ color: "var(--fog)", flexShrink: 0 }}>[{line.time}]</span>
           <span
             style={{
@@ -56,19 +77,23 @@ function MockTerminalLog() {
           <span style={{ color: "var(--parchment)" }}>{line.msg}</span>
         </div>
       ))}
+      <div ref={messagesEndRef} />
     </div>
   );
 }
 
 export default function HeartbeatLog() {
   return (
-    <ComingSoonPanel
-      icon="💓"
-      title="HEARTBEAT Log"
-      description="Every OpenClaw pipeline run will be logged here in real-time — with timestamps, domains scanned, signal counts, Supabase upsert results, and total duration. Full observability into your AI agent's activity."
-      eta="~3 weeks"
-    >
-      <MockTerminalLog />
-    </ComingSoonPanel>
+    <div className="animate-fade-up">
+      <div style={{ marginBottom: "24px", padding: "0 16px" }}>
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: "700", color: "var(--cream)", marginBottom: "6px" }}>
+          HEARTBEAT Log
+        </h2>
+        <p style={{ fontSize: "14px", color: "var(--fog)" }}>
+          Real-time activity log from the OpenClaw autonomous pipeline.
+        </p>
+      </div>
+      <TerminalLog />
+    </div>
   );
 }

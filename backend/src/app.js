@@ -36,6 +36,7 @@ function createApp() {
   app.use('/opportunities', opportunitiesRouter);
   app.use('/context', contextRouter);
   app.use('/copilot', copilotRouter);
+  app.use('/logs', require('./routes/logs'));
 
   app.use((error, req, res, next) => {
     if (error?.message?.startsWith('CORS blocked for origin')) {

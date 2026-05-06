@@ -26,7 +26,9 @@ function generateMockInvestors(opportunities = []) {
       const name = pool[(i + j) % pool.length];
       const type = isSeed ? "Seed / Early Stage" : "Tier 1 VC";
 
-      const matchPercent = Math.min(99, Math.max(75, score + (j * 5) + 12));
+      // Base match logic: Seed investors like high scores (whitespace), Tier 1 investors like lower scores (proven)
+      const baseMatch = isSeed ? score : (100 - score + 15);
+      const matchPercent = Math.min(98, Math.max(45, Math.floor(baseMatch + (j * 6) + (i % 7))));
 
       investors.push({
         id: `${domain}-${name}-${j}`,

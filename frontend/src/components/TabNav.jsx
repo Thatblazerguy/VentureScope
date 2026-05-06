@@ -4,7 +4,7 @@ export const TABS = [
   { id: "copilot",  label: "Venture Copilot", icon: "⚡", status: "live" },
   { id: "intel",    label: "Investor Intel",  icon: "📡", status: "live" },
   { id: "digest",   label: "Weekly Digest",   icon: "📋", status: "coming-soon" },
-  { id: "heartbeat",label: "HEARTBEAT Log",   icon: "💓", status: "coming-soon" },
+  { id: "heartbeat",label: "HEARTBEAT Log",   icon: "💓", status: "live" },
 ];
 
 export default function TabNav({ activeTab, onTabChange }) {
