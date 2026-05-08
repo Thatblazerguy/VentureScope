@@ -227,7 +227,7 @@ function HamburgerButton({ isOpen, onClick }) {
 }
 
 // ─── Navbar Main Component ──────────────────────────────────────────────────
-export default function Navbar({ apiBase, isSidebarOpen, onToggleSidebar }) {
+export default function Navbar({ apiBase, isSidebarOpen, onToggleSidebar, onLogout }) {
   return (
     <>
       <style>{`
@@ -282,8 +282,38 @@ export default function Navbar({ apiBase, isSidebarOpen, onToggleSidebar }) {
           <PipelineHealthChip apiBase={apiBase} />
         </div>
 
-        {/* RIGHT: Agent Mode badge */}
-        <AgentModeBadge />
+        {/* RIGHT: Log Out */}
+        <button
+          onClick={onLogout}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "5px 12px",
+            borderRadius: "var(--radius-pill)",
+            background: "rgba(117, 86, 63, 0.10)",
+            border: "1px solid rgba(117, 86, 63, 0.22)",
+            cursor: "pointer",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
+            fontWeight: "500",
+            letterSpacing: "0.08em",
+            color: "var(--amber-light)",
+            textTransform: "uppercase",
+            userSelect: "none",
+            transition: "background 160ms ease, border-color 160ms ease",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "rgba(117, 86, 63, 0.18)";
+            e.currentTarget.style.borderColor = "rgba(117, 86, 63, 0.4)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "rgba(117, 86, 63, 0.10)";
+            e.currentTarget.style.borderColor = "rgba(117, 86, 63, 0.22)";
+          }}
+        >
+          Log Out
+        </button>
       </nav>
     </>
   );

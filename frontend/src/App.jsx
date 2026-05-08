@@ -5,7 +5,7 @@ import Navbar       from "./components/Navbar";
 import Sidebar      from "./components/Sidebar";
 import TabNav, { TABS } from "./components/TabNav";
 import { GapRadar } from "./components/GapRadar";
-import { CopilotChat } from "./components/CopilotChat";
+import CopilotWidget  from "./components/CopilotWidget";
 import InvestorIntel  from "./components/InvestorIntel";
 import WeeklyDigest   from "./components/WeeklyDigest";
 import CoFounderMatch from "./components/CoFounderMatch";
@@ -16,7 +16,7 @@ import { getContext, getOpportunities, updateContext, API_BASE_URL } from './lib
 // ── Your existing API base URL constant (keep as-is from your current App.jsx) ──
 const API_BASE = API_BASE_URL || "http://localhost:8000";
 
-export default function App() {
+export default function App({ onLogout }) {
 
   // ── Sidebar open state (for mobile drawer) ──────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -201,8 +201,6 @@ export default function App() {
           </div>
         );
 
-      case "copilot":
-        return null; // Rendered persistently outside switch to preserve chat history
 
       case "intel":
         return (
@@ -245,6 +243,7 @@ export default function App() {
         apiBase={API_BASE}
         isSidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+        onLogout={onLogout}
       />
 
       {/* Fixed left sidebar */}
@@ -299,27 +298,12 @@ export default function App() {
         <div style={{ flex: 1, overflowY: "auto" }}>
           {error && <p style={{ color: "var(--danger)", padding: "24px", textAlign: "center" }}>{error}</p>}
           
-          {/* Always mount CopilotChat to preserve chat history, but hide it if not active */}
-          <div style={{ display: !loading && activeTab === "copilot" ? "block" : "none", height: "100%" }}>
-            <div
-              className={activeTab === "copilot" ? "animate-tab-enter" : ""}
-              style={{
-                padding: "0",
-                height: "calc(100vh - var(--navbar-height) - 53px)", // subtract tab nav height
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <CopilotChat
-                apiBase={API_BASE}
-                domains={domains}
-              />
-            </div>
-          </div>
-
           {renderTabContent()}
         </div>
       </main>
+
+      {/* ── Floating Copilot Widget — accessible from every tab ── */}
+      <CopilotWidget apiBase={API_BASE} domains={domains} />
     </>
   );
 }

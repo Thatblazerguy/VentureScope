@@ -1,71 +1,84 @@
 import { useState } from "react";
 
-// ── Mock Data ────────────────────────────────────────────────────────────────
+// ── Real Founder Data (sorted by matchScore desc) ─────────────────────────────
 const MOCK_USERS = [
   {
     id: 1,
-    name: "Arjun Mehta",
-    role: "AI Developer",
-    avatar: "AM",
-    skills: ["Machine Learning", "Python", "NLP"],
-    interests: ["Healthcare AI", "EdTech", "LegalTech"],
-    savedIdeas: ["AI Diagnostics Tool", "Smart Triage System"],
-    matchScore: 92,
-    mutualDomain: "Healthcare AI",
-    bio: "Building intelligent systems that solve real-world problems.",
+    name: "Aravind Srinivas",
+    role: "CEO & Co-Founder · Perplexity AI",
+    avatar: "AS",
+    skills: ["AI", "Search", "LLMs"],
+    matchScore: 96,
+    mutualDomain: "AI",
+    bio: "Ex-OpenAI Research Scientist. Built Perplexity into the leading AI search engine backed by Jeff Bezos and Nvidia. Series C · $1B raise at $18B valuation (2025).",
     status: "Actively looking",
+    linkedin: "https://www.linkedin.com/in/aravind-srinivas-16051987/",
+    isUmbrellaMatch: true,
   },
   {
     id: 2,
-    name: "Priya Sharma",
-    role: "MBA Student",
-    avatar: "PS",
-    skills: ["Business Strategy", "Fundraising", "Marketing"],
-    interests: ["Healthcare AI", "FinTech", "SaaS"],
-    savedIdeas: ["Hospital Operations Platform", "AI Diagnostics Tool"],
-    matchScore: 88,
-    mutualDomain: "Healthcare AI",
-    bio: "Turning bold ideas into fundable, scalable businesses.",
+    name: "Dario Amodei",
+    role: "CEO & Co-Founder · Anthropic",
+    avatar: "DA",
+    skills: ["AI Safety", "LLMs", "Cloud AI"],
+    matchScore: 91,
+    mutualDomain: "AI Safety",
+    bio: "Ex-VP Research at OpenAI. Co-founded Anthropic in 2021 focused on safe AI development. Series E · $61.5B valuation (March 2025).",
     status: "Actively looking",
+    linkedin: "https://www.linkedin.com/in/dario-amodei-3934934/",
+    isUmbrellaMatch: false,
   },
   {
     id: 3,
-    name: "Rohan Verma",
-    role: "Full Stack Developer",
-    avatar: "RV",
-    skills: ["React", "Node.js", "System Design"],
-    interests: ["EdTech", "SaaS", "Developer Tools"],
-    savedIdeas: ["AI Tutor Platform", "Code Review Bot"],
-    matchScore: 79,
-    mutualDomain: "EdTech",
-    bio: "Passionate about shipping products users actually love.",
-    status: "Open to chat",
+    name: "Tim Shi",
+    role: "Co-Founder · Cresta",
+    avatar: "TS",
+    skills: ["AI", "Enterprise SaaS", "Cloud"],
+    matchScore: 88,
+    mutualDomain: "AI",
+    bio: "Ex-OpenAI (2017). Built Cresta into a leading AI contact center platform. Series C · $270M+ from Sequoia & a16z.",
+    status: "Actively looking",
+    linkedin: "https://www.linkedin.com/in/timshi/",
+    isUmbrellaMatch: false,
   },
   {
     id: 4,
-    name: "Sneha Kapoor",
-    role: "UX Designer",
-    avatar: "SK",
-    skills: ["UI/UX", "Figma", "User Research"],
-    interests: ["FinTech", "Healthcare AI", "Consumer Apps"],
-    savedIdeas: ["Personal Finance App", "Smart Triage System"],
-    matchScore: 74,
-    mutualDomain: "FinTech",
-    bio: "Design is not just how it looks — it's how it works.",
+    name: "Arjun Lalwani",
+    role: "Co-Founder · Approval AI (YC X25)",
+    avatar: "AL",
+    skills: ["AI", "SaaS", "Fintech"],
+    matchScore: 83,
+    mutualDomain: "AI",
+    bio: "YC-backed founder (Spring 2025). Building AI to simplify mortgage processes with multi-lender comparison. Pre-Seed · Y Combinator X25 Batch.",
     status: "Open to chat",
+    linkedin: "https://www.ycombinator.com/companies/approval-ai",
+    isUmbrellaMatch: false,
   },
   {
     id: 5,
-    name: "Karan Nair",
-    role: "Growth Marketer",
-    avatar: "KN",
-    skills: ["SEO", "Content Strategy", "Paid Ads"],
-    interests: ["D2C", "SaaS", "EdTech"],
-    savedIdeas: ["AI Tutor Platform", "Newsletter Monetization Tool"],
-    matchScore: 68,
-    mutualDomain: "SaaS",
-    bio: "I turn 0-to-1 startups into brands people remember.",
-    status: "Exploring",
+    name: "Supreet Deshpande",
+    role: "Co-Founder · Synthio Labs (YC X25)",
+    avatar: "SD",
+    skills: ["AI Infrastructure", "Dev Tools", "Cloud"],
+    matchScore: 79,
+    mutualDomain: "AI Infrastructure",
+    bio: "YC Spring 2025 founder building next-gen AI infrastructure tooling. Pre-Seed · Y Combinator X25 Batch.",
+    status: "Open to chat",
+    linkedin: "https://www.ycombinator.com/companies/synthiolabs",
+    isUmbrellaMatch: false,
+  },
+  {
+    id: 6,
+    name: "Anabelle Louis",
+    role: "Co-Founder · Cua (YC X25)",
+    avatar: "AL",
+    skills: ["AI Agents", "DevOps", "Cloud Containers"],
+    matchScore: 75,
+    mutualDomain: "AI Agents",
+    bio: "YC Spring 2025. Building a platform for deploying AI agents using cloud containers with cross-OS integration. Pre-Seed · Y Combinator X25 Batch.",
+    status: "Open to chat",
+    linkedin: "https://www.ycombinator.com/companies/cua",
+    isUmbrellaMatch: false,
   },
 ];
 
@@ -97,7 +110,7 @@ function Toast({ visible, onDismiss }) {
       borderRadius: "var(--radius-md)", padding: "12px 18px", marginBottom: "24px", gap: "12px",
     }}>
       <span style={{ fontSize: "13px", color: "var(--cream)" }}>
-        💡 <strong>2 people</strong> are also exploring <strong>Healthcare AI</strong> — your top interest.
+        💡 <strong>6 founders</strong> are building in <strong>AI</strong> — your top signal domain.
       </span>
       <button onClick={onDismiss} style={{
         background: "transparent", border: "none", color: "var(--fog)",
@@ -111,10 +124,6 @@ function Toast({ visible, onDismiss }) {
 function MatchCard({ user }) {
   const sc = scoreColor(user.matchScore);
   const st = STATUS_CFG[user.status] || STATUS_CFG["Exploring"];
-
-  const handleComingSoon = () => {
-    alert("🚀 Feature coming soon!");
-  };
 
   return (
     <div style={{
@@ -139,7 +148,8 @@ function MatchCard({ user }) {
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "3px" }}>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: "700", color: "var(--cream)" }}>
+            {/* Name — dark so it's visible on light card background */}
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: "700", color: "#2C1A0E" }}>
               {user.name}
             </span>
             {/* Match score badge */}
@@ -148,13 +158,22 @@ function MatchCard({ user }) {
               color: sc.color, background: sc.bg, border: `1px solid ${sc.border}`,
               padding: "2px 8px", borderRadius: "var(--radius-pill)",
             }}>{user.matchScore}% match</span>
+            {/* Umbrella match badge */}
+            {user.isUmbrellaMatch && (
+              <span style={{
+                fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: "700",
+                background: "rgba(200,146,58,0.15)", border: "1px solid rgba(200,146,58,0.4)",
+                color: "var(--amber)", padding: "2px 8px", borderRadius: "var(--radius-pill)",
+              }}>★ Top Pick</span>
+            )}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "12px", color: "var(--fog)", fontFamily: "var(--font-mono)" }}>{user.role}</span>
+            {/* Role — medium dark brown */}
+            <span style={{ fontSize: "12px", color: "#6B4530", fontFamily: "var(--font-mono)" }}>{user.role}</span>
             {/* Status dot */}
             <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
               <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: st.dot, flexShrink: 0 }} />
-              <span style={{ fontSize: "11px", color: "var(--fog)" }}>{st.label}</span>
+              <span style={{ fontSize: "11px", color: "#7B5A3C" }}>{st.label}</span>
             </span>
           </div>
         </div>
@@ -162,7 +181,7 @@ function MatchCard({ user }) {
 
       {/* Mutual domain tag */}
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <span style={{ fontSize: "10px", color: "var(--fog)", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)" }}>Mutual Domain</span>
+        <span style={{ fontSize: "10px", color: "#7B5A3C", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)" }}>Mutual Domain</span>
         <span style={{
           fontSize: "11px", padding: "2px 10px", borderRadius: "var(--radius-pill)",
           background: "rgba(200,146,58,0.1)", border: "1px solid rgba(200,146,58,0.25)", color: "var(--amber)",
@@ -170,8 +189,8 @@ function MatchCard({ user }) {
         }}>{user.mutualDomain}</span>
       </div>
 
-      {/* Bio */}
-      <p style={{ fontSize: "13px", color: "rgba(220,203,190,0.75)", lineHeight: "1.6", margin: 0 }}>
+      {/* Bio — dark readable brown */}
+      <p style={{ fontSize: "13px", color: "#4A3020", lineHeight: "1.6", margin: 0 }}>
         {user.bio}
       </p>
 
@@ -179,28 +198,35 @@ function MatchCard({ user }) {
       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
         {user.skills.slice(0, 3).map(skill => (
           <span key={skill} style={{
-            fontSize: "11px", padding: "3px 10px", background: "rgba(220,203,190,0.07)",
-            border: "1px solid var(--border)", borderRadius: "var(--radius-pill)",
-            color: "var(--parchment)", fontFamily: "var(--font-mono)",
+            fontSize: "11px", padding: "3px 10px",
+            background: "rgba(117,86,63,0.08)",
+            border: "1px solid rgba(117,86,63,0.2)", borderRadius: "var(--radius-pill)",
+            color: "#5A3C28", fontFamily: "var(--font-mono)",
           }}>{skill}</span>
         ))}
       </div>
 
       {/* Action buttons */}
       <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
-        <button
-          onClick={handleComingSoon}
+        <a
+          href={user.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             flex: 1, padding: "8px 0", borderRadius: "var(--radius-pill)",
-            background: "transparent", border: "1px solid var(--border)",
-            color: "var(--parchment)", fontSize: "12px", cursor: "pointer",
+            background: "transparent", border: "1px solid rgba(117,86,63,0.35)",
+            color: "#5A3C28", fontSize: "12px", cursor: "pointer",
             fontFamily: "var(--font-body)", transition: "all 0.2s",
+            textAlign: "center", textDecoration: "none", display: "flex",
+            alignItems: "center", justifyContent: "center", gap: "4px",
           }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(117,86,63,0.5)"; e.currentTarget.style.color = "var(--cream)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--parchment)"; }}
-        >View Profile</button>
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(117,86,63,0.6)"; e.currentTarget.style.color = "#2C1A0E"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(117,86,63,0.35)"; e.currentTarget.style.color = "#5A3C28"; }}
+        >
+          ↗ View Profile
+        </a>
         <button
-          onClick={handleComingSoon}
+          onClick={() => alert("🚀 Feature coming soon!")}
           style={{
             flex: 1, padding: "8px 0", borderRadius: "var(--radius-pill)",
             background: "linear-gradient(135deg, rgba(117,86,63,0.25), rgba(200,146,58,0.15))",
@@ -250,7 +276,7 @@ export default function CoFounderMatch() {
             background: "rgba(117,86,63,0.15)", border: "1px solid rgba(117,86,63,0.4)",
             color: "var(--brown)", padding: "3px 10px", borderRadius: "var(--radius-pill)",
           }}>
-            🤝 5 people exploring similar opportunities
+            🤝 6 founders exploring similar opportunities
           </span>
         </div>
         <p style={{ fontSize: "14px", color: "var(--fog)", lineHeight: "1.6" }}>
@@ -297,7 +323,7 @@ export default function CoFounderMatch() {
       {/* ── Footer note ─────────────────────────────────────────────────────── */}
       <div style={{ marginTop: "40px", paddingTop: "16px", borderTop: "1px solid var(--border)", textAlign: "center" }}>
         <p style={{ fontSize: "12px", color: "var(--fog)", fontStyle: "italic" }}>
-          Co-Founder matching uses your SOUL profile domains and saved opportunities to surface relevant builders.
+          Co-Founder matching uses your SOUL profile domains and saved opportunities to surface relevant builders. Data sourced from TechCrunch, YC Directory — public records.
         </p>
       </div>
     </div>
