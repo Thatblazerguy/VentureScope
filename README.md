@@ -12,6 +12,8 @@
 
 ![Hero](docs/screenshots/hero.png)
 
+> **Live at:** [github.com/Thatblazerguy/VentureScope](https://github.com/Thatblazerguy/VentureScope)
+
 ---
 
 ## Overview
@@ -31,23 +33,51 @@ The platform provides five integrated intelligence modules accessible via a pers
 
 ## Screenshots
 
-### 🏠 Landing Page
+### 🏠 Landing Page — Hero
+![Hero](docs/screenshots/hero.png)
 
-![Landing Page](docs/screenshots/hero.png)
+### 🏠 Landing Page — Features
+![Features](docs/screenshots/features.png)
 
-*Animated warm contour-line canvas, hero headline, and feature showcase with smooth scroll navigation.*
+*Animated warm contour-line canvas, hero headline, ArXiv Pulse · Market Saturation · Gap Scores feature cards.*
 
-### 🔐 Authentication
+### 🔐 Sign In
+![Sign In](docs/screenshots/signin.png)
 
-![Auth Screens](docs/screenshots/auth.png)
+### 📝 Sign Up + OTP Verification
+![Sign Up](docs/screenshots/signup.png)
 
-*Left: Direct sign-in (email + password). Right: Sign-up with 2-step EmailJS OTP email verification.*
+*2-step: registration form → 6-digit EmailJS OTP verification sent to inbox.*
 
 ### 📊 Dashboard — Gap Radar
-
 ![Dashboard](docs/screenshots/dashboard.png)
 
-*Pentagon radar chart + opportunity score cards. Left sidebar with SOUL Context editor.*
+*Pentagon radar chart + opportunity score cards. Left sidebar with SOUL Context editor, Risk Appetite toggle, Agent Status.*
+
+### ⚡ Venture Copilot
+![Copilot](docs/screenshots/copilot.png)
+
+*Floating slide-up popup — Gemini 2.5 Flash streaming chatbot, accessible from every tab.*
+
+### 📡 Investor Intel
+![Investor Intel](docs/screenshots/investor-intel.png)
+
+*Warm-path matched investor cards for Sequoia, a16z, Founders Fund etc. based on active Gap Radar domains.*
+
+### 📋 Weekly Digest
+![Weekly Digest](docs/screenshots/weekly-digest.png)
+
+*OpenClaw executive summary + ranked opportunity table with signal classifications.*
+
+### 🤝 Co-Founder Match
+![Co-Founder Match](docs/screenshots/cofounder-match.png)
+
+*Real founder profiles — Aravind Srinivas, Dario Amodei, YC Spring 2025 founders — matched to your domains.*
+
+### 💓 HEARTBEAT Log
+![HEARTBEAT Log](docs/screenshots/heartbeat-log.png)
+
+*Real-time SSE terminal streaming live OpenClaw pipeline activity.*
 
 ---
 
