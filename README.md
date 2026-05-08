@@ -139,7 +139,7 @@ An **OpenClaw-generated executive briefing** on your tracked domains.
 ### 🤝 Co-Founder Match
 A curated directory of **real-world founders** building in AI-adjacent spaces, matched to your domains.
 
-Hardcoded with 6 verified public profiles sourced from TechCrunch and YC Directory:
+Built with a sample of limited verified public profiles sourced from TechCrunch and YC Directory:
 
 | Founder | Company | Score | Source |
 |---------|---------|-------|--------|
