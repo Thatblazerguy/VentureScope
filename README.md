@@ -74,10 +74,6 @@ The platform provides five integrated intelligence modules accessible via a pers
 
 *Real founder profiles — Aravind Srinivas, Dario Amodei, YC Spring 2025 founders — matched to your domains.*
 
-### 💓 HEARTBEAT Log
-![HEARTBEAT Log](docs/screenshots/heartbeat-log.png)
-
-*Real-time SSE terminal streaming live OpenClaw pipeline activity.*
 
 ---
 
